@@ -29,8 +29,45 @@ interface ExpandedDataType {
 }
 
 const App: React.FC = () => {
+  const [updateDictionary, setUpdateDictionary] = useState<
+    Dictionary<ExpandedDataType>
+  >({});
   const expandedRowRender = (record: DataType) => {
     const columns: TableColumnsType<ExpandedDataType> = [
+      {
+        title: '',
+        key: 'icon',
+        render: (
+          text: string,
+          childRecord: ExpandedDataType,
+          index: number
+        ) => {
+          return (
+            <a
+              onClick={async () => {
+                //模拟你的接口请求
+                var updateOldRecord = new Promise((res, err) => {
+                  setTimeout(() => {
+                    let oldRecord = childRecord;
+                    oldRecord.date = Math.random().toString();
+                    res(oldRecord);
+                  }, 500);
+                });
+                //合并以前的更新缓存到新的字典
+                let newExpandDictionary = Object.assign({}, updateDictionary);
+                //获取更新后的数据
+                let newdata = await updateOldRecord;
+                //更新字典集合中的key为新的数据
+                newExpandDictionary[childRecord.key] = newdata;
+                //更新字典-因为useState改变，会触发整个render更新
+                setUpdateDictionary(newExpandDictionary);
+              }}
+            >
+              更新
+            </a>
+          );
+        },
+      },
       { title: 'Date', dataIndex: 'date', key: 'date' },
       { title: 'Name', dataIndex: 'name', key: 'name' },
       {
@@ -50,9 +87,14 @@ const App: React.FC = () => {
         ),
       },
     ];
-
     let data = record.child;
-    if (!expandDictionary[record.key]) data = record.child.splice(0, 2);
+    let newdata = record.child.slice();
+    if (!expandDictionary[record.key]) data = newdata.splice(0, 2);
+    //进行数据更新处理，在updateDictionary更新字典中存在就取更新字典的值，否则取原数据的值
+    data = data.map((t) => {
+      if (!updateDictionary[t.key]) return t;
+      return updateDictionary[t.key];
+    });
     return (
       <Table
         pagination={false}
@@ -79,6 +121,7 @@ const App: React.FC = () => {
         return (
           <a
             onClick={() => {
+              console.log(213);
               let newExpandDictionary = Object.assign({}, expandDictionary);
               newExpandDictionary[record.key] = !itemExpandDictionary;
               setExpandDictionary(newExpandDictionary);
@@ -99,7 +142,7 @@ const App: React.FC = () => {
   ];
 
   const data: DataType[] = [];
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < 2; i++) {
     data.push({
       key: i.toString(),
       name: 'Screen',
@@ -110,26 +153,26 @@ const App: React.FC = () => {
       createdAt: '2014-12-24 23:12:00',
       child: [
         {
-          key: '312',
-          date: '2014-12-24 23:12:00',
+          key: i + '0000000001',
+          date: '2014-12-24 23:12:01',
           name: 'This is production name',
           upgradeNum: 'Upgraded: 56',
         },
         {
-          key: '3133',
-          date: '2014-12-24 23:12:00',
+          key: i + '000000000002',
+          date: '2014-12-24 23:12:02',
           name: 'This is production name',
           upgradeNum: 'Upgraded: 56',
         },
         {
-          key: '31244',
-          date: '2014-12-24 23:12:00',
+          key: i + '000000000003',
+          date: '2014-12-24 23:12:03',
           name: 'This is production name',
           upgradeNum: 'Upgraded: 56',
         },
         {
-          key: '3124554',
-          date: '2014-12-24 23:12:00',
+          key: i + '000000000004',
+          date: '2014-12-24 23:12:04',
           name: 'This is production name',
           upgradeNum: 'Upgraded: 56',
         },
