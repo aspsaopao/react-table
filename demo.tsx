@@ -7,7 +7,7 @@ import { Badge, Space, Table } from 'antd';
  * 字典集合
  */
 interface Dictionary<T> {
-  ['key']?: T;
+  [key: string]: T;
 }
 
 interface DataType {
@@ -22,10 +22,10 @@ interface DataType {
 }
 
 interface ExpandedDataType {
-  key: React.Key;
-  date: string;
-  name: string;
-  upgradeNum: string;
+  key?: React.Key;
+  date?: string;
+  name?: string;
+  upgradeNum?: string;
 }
 
 const App: React.FC = () => {
